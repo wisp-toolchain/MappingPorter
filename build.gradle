@@ -16,5 +16,5 @@ repositories {
 dependencies {
     implementation("cuchaz:enigma:2.3.5+local")
     implementation("net.fabricmc:tiny-remapper:0.8.13+local")
-    implementation("net.fabricmc:mapping-io:0.5.5+local")
+    implementation("net.fabricmc:mapping-io:0.5.6+local")
 }

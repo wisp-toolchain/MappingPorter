@@ -31,16 +31,16 @@ public class RemappingMappingVisitor extends ForwardingMappingVisitor {
 
     @Override
     public boolean visitClass(String srcName) throws IOException {
-        if (!srcName.contains("class_"))
-            return super.visitClass(srcName);
         MappingTree.ClassMapping old = oldIntermediary.getClass(srcName, sourceNamespace);
         if (old == null) {
             System.out.println("Skipping null class: " + srcName);
-            return super.visitClass(srcName);
+            return false;
         }
         MappingTree.ClassMapping entry = intermediary.getClass(old.getSrcName(), targetNamespace);
         old.getMethods().forEach(methodMapping -> {
-            methodLookup.put(methodMapping.getDstName(sourceNamespace), entry.getMethod(methodMapping.getSrcName(), methodMapping.getSrcDesc(), targetNamespace));
+            var mapping = entry.getMethod(methodMapping.getSrcName(), methodMapping.getSrcDesc(), targetNamespace);
+            if (mapping != null)
+                methodLookup.put(methodMapping.getDstName(sourceNamespace), mapping);
         });
         old.getFields().forEach(fieldMapping -> {
             fieldLookup.put(fieldMapping.getDstName(sourceNamespace), entry.getField(fieldMapping.getSrcName(), fieldMapping.getSrcDesc(), targetNamespace));
@@ -51,10 +51,10 @@ public class RemappingMappingVisitor extends ForwardingMappingVisitor {
     @Override
     public boolean visitField(String srcName, String srcDesc) throws IOException {
         if (!srcName.contains("field_"))
-            return super.visitClass(srcName);
+            return super.visitMethod(srcName, srcDesc);
         if (!fieldLookup.containsKey(srcName)) {
             System.out.println("Skipping null field: " + srcName);
-            return super.visitField(srcName, srcDesc);
+            return false;
         }
         MappingTree.FieldMapping mapping = fieldLookup.get(srcName);
         return super.visitField(mapping.getSrcName(), mapping.getSrcDesc());
@@ -66,7 +66,7 @@ public class RemappingMappingVisitor extends ForwardingMappingVisitor {
             return super.visitMethod(srcName, srcDesc);
         if (!methodLookup.containsKey(srcName)) {
             System.out.println("Skipping null method: " + srcName);
-            return super.visitMethod(srcName, srcDesc);
+            return false;
         }
         MappingTree.MethodMapping mapping = methodLookup.get(srcName);
         return super.visitMethod(mapping.getSrcName(), mapping.getSrcDesc());
