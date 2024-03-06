@@ -1,0 +1,20 @@
+plugins {
+    id 'java'
+}
+
+group = 'me.alphamode.wisp.mapping_porter'
+version = '0.1'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+        url = "https://maven.fabricmc.net/"
+    }
+}
+
+dependencies {
+    implementation("cuchaz:enigma:2.3.5+local")
+    implementation("net.fabricmc:tiny-remapper:0.8.13+local")
+    implementation("net.fabricmc:mapping-io:0.5.5+local")
+}
